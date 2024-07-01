@@ -16,12 +16,6 @@
  */
 package org.apache.rocketmq.namesrv;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
-import java.util.concurrent.Callable;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -34,12 +28,19 @@ import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.namesrv.NamesrvConfig;
 import org.apache.rocketmq.controller.ControllerManager;
 import org.apache.rocketmq.logging.org.slf4j.Logger;
+import org.apache.rocketmq.logging.org.slf4j.LoggerFactory;
 import org.apache.rocketmq.remoting.netty.NettyClientConfig;
 import org.apache.rocketmq.remoting.netty.NettyServerConfig;
 import org.apache.rocketmq.remoting.protocol.RemotingCommand;
-import org.apache.rocketmq.logging.org.slf4j.LoggerFactory;
 import org.apache.rocketmq.srvutil.ServerUtil;
 import org.apache.rocketmq.srvutil.ShutdownHookThread;
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.concurrent.Callable;
 
 public class NamesrvStartup {
 
@@ -52,6 +53,8 @@ public class NamesrvStartup {
     private static ControllerConfig controllerConfig = null;
 
     public static void main(String[] args) {
+        // 需要注意，本地启动需要配置启动参数，推荐新建一个ROCKETMQ_HOME目录，用于存放配置目录，里面有三个目录：conf、logs、store
+        // 在启动参数中添加ROCKETMQ_HOME=刚刚新建的ROCKETMQ_HOME目录
         main0(args);
         controllerManagerMain();
     }

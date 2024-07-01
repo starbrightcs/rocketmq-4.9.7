@@ -20,16 +20,47 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.rocketmq.remoting.RPCHook;
 
+/**
+ * 子命令接口
+ */
 public interface SubCommand {
+
+    /**
+     * 子命令名称
+     */
     String commandName();
 
+    /**
+     * 子命令别名
+     *
+     * @return 子命令别名
+     */
     default String commandAlias() {
         return null;
     }
 
+    /**
+     * 命令描述
+     *
+     * @return 命令描述
+     */
     String commandDesc();
 
+    /**
+     * 构建命令解析器
+     *
+     * @param options 命令
+     * @return 构建命令解析器
+     */
     Options buildCommandlineOptions(final Options options);
 
+    /**
+     * 执行命令
+     *
+     * @param commandLine 命令行
+     * @param options     命令
+     * @param rpcHook     回调
+     * @throws SubCommandException 异常
+     */
     void execute(final CommandLine commandLine, final Options options, RPCHook rpcHook) throws SubCommandException;
 }

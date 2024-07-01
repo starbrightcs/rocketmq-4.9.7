@@ -16,8 +16,6 @@
  */
 package org.apache.rocketmq.tools.command;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -31,93 +29,40 @@ import org.apache.rocketmq.tools.command.acl.ClusterAclConfigVersionListSubComma
 import org.apache.rocketmq.tools.command.acl.DeleteAccessConfigSubCommand;
 import org.apache.rocketmq.tools.command.acl.UpdateAccessConfigSubCommand;
 import org.apache.rocketmq.tools.command.acl.UpdateGlobalWhiteAddrSubCommand;
-import org.apache.rocketmq.tools.command.auth.CopyAclsSubCommand;
-import org.apache.rocketmq.tools.command.auth.CopyUsersSubCommand;
-import org.apache.rocketmq.tools.command.auth.CreateAclSubCommand;
-import org.apache.rocketmq.tools.command.auth.CreateUserSubCommand;
-import org.apache.rocketmq.tools.command.auth.DeleteAclSubCommand;
-import org.apache.rocketmq.tools.command.auth.DeleteUserSubCommand;
-import org.apache.rocketmq.tools.command.auth.GetAclSubCommand;
-import org.apache.rocketmq.tools.command.auth.GetUserSubCommand;
-import org.apache.rocketmq.tools.command.auth.ListAclSubCommand;
-import org.apache.rocketmq.tools.command.auth.ListUserSubCommand;
-import org.apache.rocketmq.tools.command.auth.UpdateAclSubCommand;
-import org.apache.rocketmq.tools.command.auth.UpdateUserSubCommand;
-import org.apache.rocketmq.tools.command.broker.BrokerConsumeStatsSubCommad;
-import org.apache.rocketmq.tools.command.broker.BrokerStatusSubCommand;
-import org.apache.rocketmq.tools.command.broker.CleanExpiredCQSubCommand;
-import org.apache.rocketmq.tools.command.broker.CleanUnusedTopicCommand;
-import org.apache.rocketmq.tools.command.broker.CommitLogSetReadAheadSubCommand;
-import org.apache.rocketmq.tools.command.broker.DeleteExpiredCommitLogSubCommand;
-import org.apache.rocketmq.tools.command.broker.GetBrokerConfigCommand;
-import org.apache.rocketmq.tools.command.broker.GetBrokerEpochSubCommand;
-import org.apache.rocketmq.tools.command.broker.GetColdDataFlowCtrInfoSubCommand;
-import org.apache.rocketmq.tools.command.broker.RemoveColdDataFlowCtrGroupConfigSubCommand;
-import org.apache.rocketmq.tools.command.broker.ResetMasterFlushOffsetSubCommand;
-import org.apache.rocketmq.tools.command.broker.SendMsgStatusCommand;
-import org.apache.rocketmq.tools.command.broker.UpdateBrokerConfigSubCommand;
-import org.apache.rocketmq.tools.command.broker.UpdateColdDataFlowCtrGroupConfigSubCommand;
+import org.apache.rocketmq.tools.command.auth.*;
+import org.apache.rocketmq.tools.command.broker.*;
 import org.apache.rocketmq.tools.command.cluster.CLusterSendMsgRTCommand;
 import org.apache.rocketmq.tools.command.cluster.ClusterListSubCommand;
 import org.apache.rocketmq.tools.command.connection.ConsumerConnectionSubCommand;
 import org.apache.rocketmq.tools.command.connection.ProducerConnectionSubCommand;
-import org.apache.rocketmq.tools.command.consumer.ConsumerProgressSubCommand;
-import org.apache.rocketmq.tools.command.consumer.ConsumerStatusSubCommand;
-import org.apache.rocketmq.tools.command.consumer.DeleteSubscriptionGroupCommand;
-import org.apache.rocketmq.tools.command.consumer.GetConsumerConfigSubCommand;
-import org.apache.rocketmq.tools.command.consumer.SetConsumeModeSubCommand;
-import org.apache.rocketmq.tools.command.consumer.StartMonitoringSubCommand;
-import org.apache.rocketmq.tools.command.consumer.UpdateSubGroupSubCommand;
+import org.apache.rocketmq.tools.command.consumer.*;
 import org.apache.rocketmq.tools.command.container.AddBrokerSubCommand;
 import org.apache.rocketmq.tools.command.container.RemoveBrokerSubCommand;
-import org.apache.rocketmq.tools.command.controller.CleanControllerBrokerMetaSubCommand;
-import org.apache.rocketmq.tools.command.controller.GetControllerConfigSubCommand;
-import org.apache.rocketmq.tools.command.controller.GetControllerMetaDataSubCommand;
-import org.apache.rocketmq.tools.command.controller.ReElectMasterSubCommand;
-import org.apache.rocketmq.tools.command.controller.UpdateControllerConfigSubCommand;
+import org.apache.rocketmq.tools.command.controller.*;
 import org.apache.rocketmq.tools.command.export.ExportConfigsCommand;
 import org.apache.rocketmq.tools.command.export.ExportMetadataCommand;
 import org.apache.rocketmq.tools.command.export.ExportMetadataInRocksDBCommand;
 import org.apache.rocketmq.tools.command.export.ExportMetricsCommand;
 import org.apache.rocketmq.tools.command.ha.GetSyncStateSetSubCommand;
 import org.apache.rocketmq.tools.command.ha.HAStatusSubCommand;
-import org.apache.rocketmq.tools.command.message.CheckMsgSendRTCommand;
-import org.apache.rocketmq.tools.command.message.ConsumeMessageCommand;
-import org.apache.rocketmq.tools.command.message.DumpCompactionLogCommand;
-import org.apache.rocketmq.tools.command.message.PrintMessageByQueueCommand;
-import org.apache.rocketmq.tools.command.message.PrintMessageSubCommand;
-import org.apache.rocketmq.tools.command.message.QueryMsgByIdSubCommand;
-import org.apache.rocketmq.tools.command.message.QueryMsgByKeySubCommand;
-import org.apache.rocketmq.tools.command.message.QueryMsgByOffsetSubCommand;
-import org.apache.rocketmq.tools.command.message.QueryMsgByUniqueKeySubCommand;
-import org.apache.rocketmq.tools.command.message.QueryMsgTraceByIdSubCommand;
-import org.apache.rocketmq.tools.command.message.SendMessageCommand;
-import org.apache.rocketmq.tools.command.namesrv.AddWritePermSubCommand;
-import org.apache.rocketmq.tools.command.namesrv.DeleteKvConfigCommand;
-import org.apache.rocketmq.tools.command.namesrv.GetNamesrvConfigCommand;
-import org.apache.rocketmq.tools.command.namesrv.UpdateKvConfigCommand;
-import org.apache.rocketmq.tools.command.namesrv.UpdateNamesrvConfigCommand;
-import org.apache.rocketmq.tools.command.namesrv.WipeWritePermSubCommand;
+import org.apache.rocketmq.tools.command.message.*;
+import org.apache.rocketmq.tools.command.namesrv.*;
 import org.apache.rocketmq.tools.command.offset.CloneGroupOffsetCommand;
 import org.apache.rocketmq.tools.command.offset.ResetOffsetByTimeCommand;
 import org.apache.rocketmq.tools.command.offset.SkipAccumulationSubCommand;
 import org.apache.rocketmq.tools.command.producer.ProducerSubCommand;
 import org.apache.rocketmq.tools.command.queue.QueryConsumeQueueCommand;
 import org.apache.rocketmq.tools.command.stats.StatsAllSubCommand;
-import org.apache.rocketmq.tools.command.topic.AllocateMQSubCommand;
-import org.apache.rocketmq.tools.command.topic.DeleteTopicSubCommand;
-import org.apache.rocketmq.tools.command.topic.RemappingStaticTopicSubCommand;
-import org.apache.rocketmq.tools.command.topic.TopicClusterSubCommand;
-import org.apache.rocketmq.tools.command.topic.TopicListSubCommand;
-import org.apache.rocketmq.tools.command.topic.TopicRouteSubCommand;
-import org.apache.rocketmq.tools.command.topic.TopicStatusSubCommand;
-import org.apache.rocketmq.tools.command.topic.UpdateOrderConfCommand;
-import org.apache.rocketmq.tools.command.topic.UpdateStaticTopicSubCommand;
-import org.apache.rocketmq.tools.command.topic.UpdateTopicListSubCommand;
-import org.apache.rocketmq.tools.command.topic.UpdateTopicPermSubCommand;
-import org.apache.rocketmq.tools.command.topic.UpdateTopicSubCommand;
+import org.apache.rocketmq.tools.command.topic.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MQAdminStartup {
+
+    /**
+     * 初始化命令
+     */
     protected static final List<SubCommand> SUB_COMMANDS = new ArrayList<>();
 
     private static final String ROCKETMQ_HOME = System.getProperty(MixAll.ROCKETMQ_HOME_PROPERTY,
@@ -132,13 +77,18 @@ public class MQAdminStartup {
 
         //PackageConflictDetect.detectFastjson();
 
+        // 1、调用 initCommand 方法加载所有的命令
         initCommand();
 
         try {
+            // 2、判断启动该类 main 方法传入的参数
             switch (args.length) {
+                // 2.1、如果没有参数，则打印帮助信息
                 case 0:
                     printHelp();
                     break;
+                // 2.2、如果参数为 2 个，并且第一个是 help，第二个参数是 initCommand()加载的命令名称，
+                // 则调用 ServerUtil.printCommandLineHelp() 方法打印指定命令的帮助信息。
                 case 2:
                     if (args[0].equals("help")) {
                         SubCommand cmd = findSubCommand(args[1]);
@@ -153,6 +103,8 @@ public class MQAdminStartup {
                         }
                         break;
                     }
+                    // 2.3、如果参数为一个、或 2 个，并且第一个参数不为 help，或多个。并且第一个参数为 initCommand() 加载的命令，
+                    // 则调用 该initCommand() 加载类中的 execute() 方法。
                 case 1:
                 default:
                     SubCommand cmd = findSubCommand(args[0]);
@@ -174,6 +126,7 @@ public class MQAdminStartup {
                         if (rpcHook != null) {
                             cmd.execute(commandLine, options, rpcHook);
                         } else {
+                            // 执行脚本命令
                             cmd.execute(commandLine, options, AclUtils.getAclRPCHook(ROCKETMQ_HOME + MixAll.ACL_CONF_TOOLS_FILE));
                         }
                     } else {
@@ -186,6 +139,9 @@ public class MQAdminStartup {
         }
     }
 
+    /**
+     * 初始化对应的 MQ Admin 命令
+     */
     public static void initCommand() {
         initCommand(new UpdateTopicSubCommand());
         initCommand(new UpdateTopicListSubCommand());

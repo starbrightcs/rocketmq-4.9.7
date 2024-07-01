@@ -16,9 +16,6 @@
  */
 package org.apache.rocketmq.tools.command.topic;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -33,6 +30,12 @@ import org.apache.rocketmq.tools.command.CommandUtil;
 import org.apache.rocketmq.tools.command.SubCommand;
 import org.apache.rocketmq.tools.command.SubCommandException;
 
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * 创建或更新 topic 命令
+ */
 public class UpdateTopicSubCommand implements SubCommand {
 
     @Override
@@ -145,6 +148,9 @@ public class UpdateTopicSubCommand implements SubCommand {
             }
             topicConfig.setOrder(isOrder);
 
+            // 对应的 -b 和 -c 命令只能执行一个：
+            // -b 对应的是在指定的 broker 上创建 topic
+            // -c 对应的是在指定的集群上的每一个 broker 创建 topic
             if (commandLine.hasOption('b')) {
                 String addr = commandLine.getOptionValue('b').trim();
 
