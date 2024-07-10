@@ -16,12 +16,16 @@
  */
 package org.apache.rocketmq.common.topic;
 
+import org.apache.rocketmq.common.UtilAll;
+
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.rocketmq.common.UtilAll;
 
 public class TopicValidator {
 
+    /**
+     * 当 isAutoCreateTopicEnable 时将在代理处创建
+     */
     public static final String AUTO_CREATE_TOPIC_KEY_TOPIC = "TBW102"; // Will be created at broker when isAutoCreateTopicEnable
     public static final String RMQ_SYS_SCHEDULE_TOPIC = "SCHEDULE_TOPIC_XXXX";
     public static final String RMQ_SYS_BENCHMARK_TOPIC = "BenchmarkTest";
@@ -58,6 +62,7 @@ public class TopicValidator {
         SYSTEM_TOPIC_SET.add(RMQ_SYS_OFFSET_MOVED_EVENT);
         SYSTEM_TOPIC_SET.add(RMQ_SYS_ROCKSDB_OFFSET_TOPIC);
 
+        // 初始化下面的 topic 不允许被用户发送消息
         NOT_ALLOWED_SEND_TOPIC_SET.add(RMQ_SYS_SCHEDULE_TOPIC);
         NOT_ALLOWED_SEND_TOPIC_SET.add(RMQ_SYS_TRANS_HALF_TOPIC);
         NOT_ALLOWED_SEND_TOPIC_SET.add(RMQ_SYS_TRANS_OP_HALF_TOPIC);

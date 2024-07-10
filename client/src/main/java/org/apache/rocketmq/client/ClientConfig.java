@@ -16,10 +16,6 @@
  */
 package org.apache.rocketmq.client;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.common.UtilAll;
 import org.apache.rocketmq.common.message.MessageQueue;
@@ -30,10 +26,18 @@ import org.apache.rocketmq.remoting.protocol.LanguageCode;
 import org.apache.rocketmq.remoting.protocol.NamespaceUtil;
 import org.apache.rocketmq.remoting.protocol.RequestType;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  * Client Common configuration
  */
 public class ClientConfig {
+    /**
+     * 使用 VIP 频道属性发送消息
+     */
     public static final String SEND_MESSAGE_WITH_VIP_CHANNEL_PROPERTY = "com.rocketmq.sendMessageWithVIPChannel";
     public static final String SOCKS_PROXY_CONFIG = "com.rocketmq.socks.proxy.config";
     public static final String DECODE_READ_BODY = "com.rocketmq.read.body";
@@ -68,6 +72,10 @@ public class ClientConfig {
     private String unitName;
     private boolean decodeReadBody = Boolean.parseBoolean(System.getProperty(DECODE_READ_BODY, "true"));
     private boolean decodeDecompressBody = Boolean.parseBoolean(System.getProperty(DECODE_DECOMPRESS_BODY, "true"));
+    /**
+     * 是否使用 VIP 频道属性发送消息，从 com.rocketmq.sendMessageWithVIPChannel 获取变量，如果没有获取到则为 false
+     * 默认端口是 10911，那么 VIP 端口就是 10909，如果设置了 true，则消息会通过 10909 进行发送
+     */
     private boolean vipChannelEnabled = Boolean.parseBoolean(System.getProperty(SEND_MESSAGE_WITH_VIP_CHANNEL_PROPERTY, "false"));
     private boolean useHeartbeatV2 = Boolean.parseBoolean(System.getProperty(HEART_BEAT_V2, "false"));
 

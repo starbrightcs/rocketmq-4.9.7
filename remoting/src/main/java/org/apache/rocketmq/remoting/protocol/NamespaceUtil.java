@@ -82,10 +82,13 @@ public class NamespaceUtil {
     }
 
     public static String wrapNamespace(String namespace, String resourceWithOutNamespace) {
+        // 1、如果 namespace 为空或者 resourceWithOutNamespace 为空，则直接返回 resourceWithOutNamespace
         if (StringUtils.isEmpty(namespace) || StringUtils.isEmpty(resourceWithOutNamespace)) {
             return resourceWithOutNamespace;
         }
 
+        // 2、如果 resourceWithOutNamespace 是 SystemResource 或者 resourceWithOutNamespace 已经组合了 Namespace，
+        // 则直接返回 resourceWithOutNamespace
         if (isSystemResource(resourceWithOutNamespace) || isAlreadyWithNamespace(resourceWithOutNamespace, namespace)) {
             return resourceWithOutNamespace;
         }
@@ -93,14 +96,17 @@ public class NamespaceUtil {
         String resourceWithoutRetryAndDLQ = withOutRetryAndDLQ(resourceWithOutNamespace);
         StringBuilder stringBuilder = new StringBuilder();
 
+        // 重试 Topic 处理标识
         if (isRetryTopic(resourceWithOutNamespace)) {
             stringBuilder.append(MixAll.RETRY_GROUP_TOPIC_PREFIX);
         }
 
+        // 死信 Topic 处理标识
         if (isDLQTopic(resourceWithOutNamespace)) {
             stringBuilder.append(MixAll.DLQ_GROUP_TOPIC_PREFIX);
         }
 
+        // 返回 [RETRY_PREFIX] + [DLQ_PREFIX] + namespace + % + resourceWithoutRetryAndDLQ
         return stringBuilder.append(namespace).append(NAMESPACE_SEPARATOR).append(resourceWithoutRetryAndDLQ).toString();
 
     }

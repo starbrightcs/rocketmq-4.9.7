@@ -24,7 +24,13 @@ import org.apache.rocketmq.common.message.MessageQueue;
 
 public class MQFaultStrategy {
     private LatencyFaultTolerance<String> latencyFaultTolerance;
+    /**
+     * 发送延迟故障启用，默认为 false
+     */
     private volatile boolean sendLatencyFaultEnable;
+    /**
+     * 探测 broker 在不在的开关
+     */
     private volatile boolean startDetectorEnable;
     private long[] latencyMax = {50L, 100L, 550L, 1800L, 3000L, 5000L, 15000L};
     private long[] notAvailableDuration = {0L, 0L, 2000L, 5000L, 6000L, 10000L, 30000L};
@@ -134,13 +140,25 @@ public class MQFaultStrategy {
         this.latencyFaultTolerance.shutdown();
     }
 
+    /**
+     * 选择发送的队列，根据是否启用 Broker 故障延迟机制走不同逻辑
+     * <p>
+     * sendLatencyFaultEnable=false，默认不启用 Broker 故障延迟机制
+     * sendLatencyFaultEnable=true，启用 Broker 故障延迟机制
+     *
+     * @param tpInfo topic 路由信息
+     * @param lastBrokerName 上一次选择的 broker name
+     * @return
+     */
     public MessageQueue selectOneMessageQueue(final TopicPublishInfo tpInfo, final String lastBrokerName, final boolean resetIndex) {
         BrokerFilter brokerFilter = threadBrokerFilter.get();
         brokerFilter.setLastBrokerName(lastBrokerName);
+        // 默认值为 false，不会执行到该分支，启用 Broker 故障延迟机制
         if (this.sendLatencyFaultEnable) {
             if (resetIndex) {
                 tpInfo.resetIndex();
             }
+            // 轮询获取一个消息队列
             MessageQueue mq = tpInfo.selectOneMessageQueue(availableFilter, brokerFilter);
             if (mq != null) {
                 return mq;

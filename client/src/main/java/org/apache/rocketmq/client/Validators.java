@@ -17,8 +17,6 @@
 
 package org.apache.rocketmq.client;
 
-import java.io.File;
-import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -29,6 +27,9 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageConst;
 import org.apache.rocketmq.common.topic.TopicValidator;
 import org.apache.rocketmq.remoting.protocol.ResponseCode;
+
+import java.io.File;
+import java.util.Properties;
 
 import static org.apache.rocketmq.common.topic.TopicValidator.isTopicOrGroupIllegal;
 
@@ -43,15 +44,18 @@ public class Validators {
      * Validate group
      */
     public static void checkGroup(String group) throws MQClientException {
+        // 检查 producer 的 groupName 是否为空
         if (UtilAll.isBlank(group)) {
             throw new MQClientException("the specified group is blank", null);
         }
 
+        // 检查 producer 的 groupName 长度是否超过 255 字符
         if (group.length() > CHARACTER_MAX_LENGTH) {
             throw new MQClientException("the specified group is longer than group max length 255.", null);
         }
 
 
+        // 检查 producer 的 groupName 是否包含非法字符
         if (isTopicOrGroupIllegal(group)) {
             throw new MQClientException(String.format(
                     "the specified group[%s] contains illegal characters, allowing only %s", group,
@@ -76,6 +80,7 @@ public class Validators {
             throw new MQClientException(ResponseCode.MESSAGE_ILLEGAL, "the message body length is zero");
         }
 
+        // 校验 body 是否超出 4M，默认设置为 4M
         if (msg.getBody().length > defaultMQProducer.getMaxMessageSize()) {
             throw new MQClientException(ResponseCode.MESSAGE_ILLEGAL,
                 "the message body size over max value, MAX: " + defaultMQProducer.getMaxMessageSize());

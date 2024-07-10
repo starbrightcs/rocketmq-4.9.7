@@ -85,8 +85,11 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     /**
      * Producer group conceptually aggregates all producer instances of exactly same role, which is particularly
      * important when transactional messages are involved. </p>
+     *
+     * <p>生产者组在概念上聚合了完全相同角色的所有生产者实例，这在涉及事务消息时尤其重要。</p>
      * <p>
      * For non-transactional messages, it does not matter as long as it's unique per process. </p>
+     * <p>对于非事务性消息，只要它在每个进程中是唯一的就没有关系。</p>
      * <p>
      * See <a href="https://rocketmq.apache.org/docs/introduction/02concepts">core concepts</a> for more discussion.
      */
@@ -94,21 +97,28 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
 
     /**
      * Topics that need to be initialized for transaction producer
+     *
+     * <p>事务生产者需要初始化的 topic</p>
      */
     private List<String> topics;
 
     /**
      * Just for testing or demo program
+     * <p>用于测试或演示程序</p>
      */
     private String createTopicKey = TopicValidator.AUTO_CREATE_TOPIC_KEY_TOPIC;
 
     /**
      * Number of queues to create per default topic.
+     *
+     * <p>每个默认主题创建的队列数。</p>
      */
     private volatile int defaultTopicQueueNums = 4;
 
     /**
      * Timeout for sending messages.
+     *
+     * <p>发送消息超时</p>
      */
     private int sendMsgTimeout = 3000;
 
@@ -121,6 +131,8 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
      * Maximum number of retry to perform internally before claiming sending failure in synchronous mode. </p>
      * <p>
      * This may potentially cause message duplication which is up to application developers to resolve.
+     *
+     * <p>在同步模式下声明发送失败之前内部执行的最大重试次数。这可能会导致消息重复，这需要应用程序开发人员来解决。</p>
      */
     private int retryTimesWhenSendFailed = 2;
 
@@ -128,16 +140,22 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
      * Maximum number of retry to perform internally before claiming sending failure in asynchronous mode. </p>
      * <p>
      * This may potentially cause message duplication which is up to application developers to resolve.
+     *
+     * <p>在异步模式下声明发送失败之前内部执行的最大重试次数。这可能会导致消息重复，这需要应用程序开发人员来解决。</p>
      */
     private int retryTimesWhenSendAsyncFailed = 2;
 
     /**
      * Indicate whether to retry another broker on sending failure internally.
+     *
+     * <p>指示内部发送失败时是否重试另一个代理</p>
      */
     private boolean retryAnotherBrokerWhenNotStoreOK = false;
 
     /**
      * Maximum allowed message body size in bytes.
+     *
+     * <p>允许的最大消息正文大小（以字节为单位）。默认为 4M</p>
      */
     private int maxMessageSize = 1024 * 1024 * 4; // 4M
 
@@ -148,6 +166,8 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
 
     /**
      * Switch flag instance for automatic batch message
+     *
+     * <p>自动批量消息的切换标志实例</p>
      */
     private boolean autoBatch = false;
     /**
@@ -163,12 +183,16 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     /**
      * on BackpressureForAsyncMode, limit maximum number of on-going sending async messages
      * default is 10000
+     *
+     * <p>在 BackPressureForAsyncMode 上，限制持续发送异步消息的最大数量，默认为 10000</p>
      */
     private int backPressureForAsyncSendNum = 10000;
 
     /**
      * on BackpressureForAsyncMode, limit maximum message size of on-going sending async messages
      * default is 100M
+     *
+     * <p>在 BackPressureForAsyncMode 上，限制持续发送异步消息的最大消息大小，默认为 100M</p>
      */
     private int backPressureForAsyncSendSize = 100 * 1024 * 1024;
 
@@ -275,11 +299,13 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
      */
     public DefaultMQProducer(final String producerGroup, RPCHook rpcHook, final List<String> topics,
         boolean enableMsgTrace, final String customizedTraceTopic) {
+        // 赋值 producerGroup 名称
         this.producerGroup = producerGroup;
         this.rpcHook = rpcHook;
         this.topics = topics;
         this.enableTrace = enableMsgTrace;
         this.traceTopic = customizedTraceTopic;
+        // 真正工作的类，把 DefaultMQProducer 实例传进去保存在成员变量中
         defaultMQProducerImpl = new DefaultMQProducerImpl(this, rpcHook);
         produceAccumulator = MQClientManager.getInstance().getOrCreateProduceAccumulator(this);
     }
@@ -341,11 +367,15 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
      */
     @Override
     public void start() throws MQClientException {
+        // 基于命名空间对 producerGroup 再次进行封装，一般用在不同业务场景下做隔离
+        // 设置生产者组，由于 DefaultMQProducer 继承了 ClientConfig，所以可以直接使用 ClientConfig#withNamespace 方法
         this.setProducerGroup(withNamespace(this.producerGroup));
+        // 调用 DefaultMQProducerImpl#start()方法启动生产者服务
         this.defaultMQProducerImpl.start();
         if (this.produceAccumulator != null) {
             this.produceAccumulator.start();
         }
+        // 用于做消息追踪，消息轨迹追踪功能可以通过 DefaultMQProducer 对象的多个参数的构造器来开启，默认是关闭
         if (enableTrace) {
             try {
                 AsyncTraceDispatcher dispatcher = new AsyncTraceDispatcher(producerGroup, TraceDispatcher.Type.PRODUCE, traceTopic, rpcHook);
@@ -365,6 +395,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
                 ((AsyncTraceDispatcher) traceDispatcher).getTraceProducer().setUseTLS(isUseTLS());
             }
             try {
+                // 启动消息轨迹追踪
                 traceDispatcher.start(this.getNamesrvAddr(), this.getAccessChannel());
             } catch (MQClientException e) {
                 logger.warn("trace dispatcher start failed ", e);
@@ -459,7 +490,9 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     @Override
     public SendResult send(Message msg,
         long timeout) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        // 1、如果设置了 namespace 则对 topic 进行包装，一般都不会设置 namespace,所以返回原生 topic
         msg.setTopic(withNamespace(msg.getTopic()));
+        // 2、调用 DefaultMQProducerImpl 对象的 send(msg) 方法发送消息，这里的 DefaultMQProducer 本质上是一个门面，实际干活的是 defaultMQProducerImpl
         return this.defaultMQProducerImpl.send(msg, timeout);
     }
 
